@@ -169,6 +169,10 @@ func (freerdp *freeRDP) FullScreenMode() *freeRDP {
 	return freerdp.AddArg("f", "")
 }
 
+func (freerdp *freeRDP) App(app *SeamlessApp) *freeRDP {
+	return freerdp.AddArg(app.toString(), "")
+}
+
 // helpers
 func checkDependencies() (string, error) {
 	commands := []string{"xfreerdp3", "xfreerdp"}
