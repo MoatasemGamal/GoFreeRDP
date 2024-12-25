@@ -2,7 +2,6 @@ package gofreerdp
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"os/exec"
 	"sync"
@@ -84,10 +83,9 @@ var optionsMap = map[string]bool{
 }
 
 type RDPConfig struct {
-	Domain   string `validate:"required,hostname|ip"`     // Domain is required, and must be a valid hostname or IP address
-	Port     int    `validate:"required,gte=1,lte=65535"` // Port must be in the range of 1 to 65535
-	Username string `validate:"required"`                 // Username is required
-	Password string `validate:"required"`                 // Password is required
+	Addr     string `validate:"required,hostname|ip"` // Addr is required, and must be a valid hostname or IP address
+	Username string `validate:"required"`             // Username is required
+	Password string `validate:"required"`             // Password is required
 }
 
 // freeRDP struct and methods
@@ -121,10 +119,6 @@ func Init() (*freeRDP, error) {
 
 // Methods
 func (freerdp *freeRDP) SetConfig(rdpConfig *RDPConfig) error {
-	if rdpConfig.Port == 0 {
-		rdpConfig.Port = 3389
-	}
-
 	validate := validator.New()
 	err := validate.Struct(rdpConfig)
 	if err != nil {
@@ -140,8 +134,7 @@ func (freerdp *freeRDP) CheckServerAvailability(timeout time.Duration) error {
 	if timeout == 0 {
 		timeout = 2 * time.Second
 	}
-	// Combine the remote address and port to form the full address (e.g., "192.168.1.1:3389")
-	address := freerdp.config.Domain + ":" + fmt.Sprintf("%d", freerdp.config.Port)
+	address := freerdp.config.Addr
 
 	// Attempt to dial the address with the specified timeout
 	conn, err := net.DialTimeout("tcp", address, timeout)
