@@ -2,8 +2,13 @@ package gofreerdp
 
 import (
 	"errors"
+	"fmt"
+	"net"
 	"os/exec"
 	"sync"
+	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 const (
@@ -112,6 +117,40 @@ func Init() (*freeRDP, error) {
 		}
 	})
 	return instance, nil
+}
+
+// Methods
+func (freerdp *freeRDP) SetConfig(rdpConfig *RDPConfig) error {
+	if rdpConfig.Port == 0 {
+		rdpConfig.Port = 3389
+	}
+
+	validate := validator.New()
+	err := validate.Struct(rdpConfig)
+	if err != nil {
+		return err
+	}
+
+	// Set the config if all validations pass
+	freerdp.config = rdpConfig
+	return nil
+}
+
+func (freerdp *freeRDP) CheckServerAvailability(timeout time.Duration) error {
+	if timeout == 0 {
+		timeout = 2 * time.Second
+	}
+	// Combine the remote address and port to form the full address (e.g., "192.168.1.1:3389")
+	address := freerdp.config.Domain + ":" + fmt.Sprintf("%d", freerdp.config.Port)
+
+	// Attempt to dial the address with the specified timeout
+	conn, err := net.DialTimeout("tcp", address, timeout)
+	if err != nil {
+		return errors.New("port is not available")
+	}
+	conn.Close()
+
+	return nil
 }
 
 // helpers
