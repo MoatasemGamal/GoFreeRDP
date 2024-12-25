@@ -46,42 +46,6 @@ const (
 	Option_windowDrag            = "window-drag"
 )
 
-var optionsMap = map[string]bool{
-	Option_aero:                  false,
-	Option_asyncChannels:         false,
-	Option_asyncUpdate:           false,
-	Option_authOnly:              false,
-	Option_authentication:        true,
-	Option_autoReconnect:         false,
-	Option_compression:           true,
-	Option_credentialsDelegation: false,
-	Option_decorations:           true,
-	Option_drives:                false,
-	Option_encryption:            true,
-	Option_fipsMode:              false,
-	Option_fonts:                 true,
-	Option_forceConsoleCallbacks: false,
-	Option_gestures:              false,
-	Option_grabKeyboard:          true,
-	Option_grabMouse:             true,
-	Option_heartbeat:             true,
-	Option_homeDrive:             false,
-	Option_menuAnims:             false,
-	Option_mouseMotion:           true,
-	Option_mouseRelative:         false,
-	Option_multiTouch:            false,
-	Option_multiTransport:        true,
-	Option_nego:                  true,
-	Option_oldLicense:            false,
-	Option_suppressOutput:        true,
-	Option_printReconnectCookie:  false,
-	Option_themes:                true,
-	Option_toggleFullscreen:      true,
-	Option_unmapButtons:          false,
-	Option_wallpaper:             true,
-	Option_windowDrag:            false,
-}
-
 type RDPConfig struct {
 	Addr     string `validate:"required,hostname|ip"` // Addr is required, and must be a valid hostname or IP address
 	Username string `validate:"required"`             // Username is required
@@ -112,7 +76,7 @@ func Init() (*freeRDP, error) {
 		// Initialize the freerdp struct when first accessed
 		instance = &freeRDP{
 			freeRDP: xfreerdp,
-			options: optionsMap,
+			options: make(map[string]bool),
 		}
 	})
 	return instance, nil
