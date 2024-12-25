@@ -200,6 +200,27 @@ func (freerdp *freeRDP) App(app *SeamlessApp) *freeRDP {
 	return freerdp.AddArg(app.toString(), "")
 }
 
+// Execute the freeRDP command
+func (freerdp *freeRDP) Run() error {
+	validate := validator.New()
+
+	if err := validate.Struct(freerdp.config); err != nil {
+		return err
+	}
+	if freerdp.freeRDP == "" {
+		return errors.New("freerdp is not installed")
+	}
+
+	params := "/v:" + freerdp.config.Addr + " /u:" + freerdp.config.Username + " /p:" + freerdp.config.Password + " " + freerdp.optionsParse() + " " + strings.Join(freerdp.arguments, " ")
+	cmd := exec.Command(freerdp.freeRDP, params)
+
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // helpers
 func checkDependencies() (string, error) {
 	commands := []string{"xfreerdp3", "xfreerdp"}
