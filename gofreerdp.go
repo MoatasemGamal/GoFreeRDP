@@ -71,3 +71,17 @@ var optionsMap = map[string]bool{
 	Option_wallpaper:             true,
 	Option_windowDrag:            false,
 }
+
+type RDPConfig struct {
+	Domain   string `validate:"required,hostname|ip"`     // Domain is required, and must be a valid hostname or IP address
+	Port     int    `validate:"required,gte=1,lte=65535"` // Port must be in the range of 1 to 65535
+	Username string `validate:"required"`                 // Username is required
+	Password string `validate:"required"`                 // Password is required
+}
+
+// freeRDP struct and methods
+type freeRDP struct {
+	freeRDP string // it may be xfreerdp or xfreerdp3 based on your system
+	config  *RDPConfig
+	options map[string]bool
+}
