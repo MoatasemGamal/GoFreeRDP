@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net"
 	"os/exec"
-	"strings"
 	"sync"
 	"time"
 
@@ -157,7 +156,7 @@ func (freerdp *freeRDP) SetBooleanOption(optionName string, optionValue bool) {
 	freerdp.options[optionName] = optionValue
 }
 
-func (freerdp *freeRDP) optionsParse() string {
+func (freerdp *freeRDP) optionsParse() []string {
 	var result []string
 
 	for option, isEnabled := range freerdp.options {
@@ -170,8 +169,7 @@ func (freerdp *freeRDP) optionsParse() string {
 		}
 	}
 
-	// Concatenate all options with spaces
-	return strings.Join(result, " ")
+	return result
 }
 
 // Arguments methods
@@ -211,8 +209,10 @@ func (freerdp *freeRDP) Run() error {
 		return errors.New("freerdp is not installed")
 	}
 
-	params := "/v:" + freerdp.config.Addr + " /u:" + freerdp.config.Username + " /p:" + freerdp.config.Password + " " + freerdp.optionsParse() + " " + strings.Join(freerdp.arguments, " ")
-	cmd := exec.Command(freerdp.freeRDP, params)
+	params := []string{"/v:" + freerdp.config.Addr, "/u:" + freerdp.config.Username, "/p:" + freerdp.config.Password}
+	params = append(params, freerdp.optionsParse()...)
+	params = append(params, freerdp.arguments...)
+	cmd := exec.Command(freerdp.freeRDP, params...)
 
 	err := cmd.Run()
 	if err != nil {
