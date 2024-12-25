@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
 
@@ -145,6 +146,32 @@ func (freerdp *freeRDP) CheckServerAvailability(timeout time.Duration) error {
 	conn.Close()
 
 	return nil
+}
+
+// Boolean options methods
+func (freerdp *freeRDP) GetBooleanOption(optionName string) bool {
+	return freerdp.options[optionName]
+}
+
+func (freerdp *freeRDP) SetBooleanOption(optionName string, optionValue bool) {
+	freerdp.options[optionName] = optionValue
+}
+
+func (freerdp *freeRDP) optionsParse() string {
+	var result []string
+
+	for option, isEnabled := range freerdp.options {
+		if isEnabled {
+			// If true, add '+' before the option
+			result = append(result, "+"+option)
+		} else {
+			// If false, add '-' before the option
+			result = append(result, "-"+option)
+		}
+	}
+
+	// Concatenate all options with spaces
+	return strings.Join(result, " ")
 }
 
 // Arguments methods
