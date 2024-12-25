@@ -90,9 +90,10 @@ type RDPConfig struct {
 
 // freeRDP struct and methods
 type freeRDP struct {
-	freeRDP string // it may be xfreerdp or xfreerdp3 based on your system
-	config  *RDPConfig
-	options map[string]bool
+	freeRDP   string // it may be xfreerdp or xfreerdp3 based on your system
+	config    *RDPConfig
+	options   map[string]bool
+	arguments []string
 }
 
 // Declare singleton instance
@@ -144,6 +145,28 @@ func (freerdp *freeRDP) CheckServerAvailability(timeout time.Duration) error {
 	conn.Close()
 
 	return nil
+}
+
+// Arguments methods
+func (freerdp *freeRDP) AddArg(argName, argValue string) *freeRDP {
+	if argValue != "" {
+		freerdp.arguments = append(freerdp.arguments, "/"+argName+":"+argValue)
+		return freerdp
+	}
+	freerdp.arguments = append(freerdp.arguments, "/"+argName)
+	return freerdp
+}
+
+func (freerdp *freeRDP) DynamicResolution() *freeRDP {
+	return freerdp.AddArg("dynamic-resolution", "")
+}
+
+func (freerdp *freeRDP) MultiMonitor() *freeRDP {
+	return freerdp.AddArg("multimon", "force")
+}
+
+func (freerdp *freeRDP) FullScreenMode() *freeRDP {
+	return freerdp.AddArg("f", "")
 }
 
 // helpers
