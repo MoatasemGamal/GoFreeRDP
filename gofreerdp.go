@@ -1,5 +1,11 @@
 package gofreerdp
 
+import (
+	"errors"
+	"os/exec"
+	"sync"
+)
+
 const (
 	Option_aero                  = "aero"
 	Option_asyncChannels         = "async-channels"
@@ -84,4 +90,39 @@ type freeRDP struct {
 	freeRDP string // it may be xfreerdp or xfreerdp3 based on your system
 	config  *RDPConfig
 	options map[string]bool
+}
+
+// Declare singleton instance
+var (
+	instance *freeRDP
+	once     sync.Once
+)
+
+func Init() (*freeRDP, error) {
+	xfreerdp, err := checkDependencies()
+	if err != nil {
+		return nil, err
+	}
+
+	once.Do(func() {
+		// Initialize the freerdp struct when first accessed
+		instance = &freeRDP{
+			freeRDP: xfreerdp,
+			options: optionsMap,
+		}
+	})
+	return instance, nil
+}
+
+// helpers
+func checkDependencies() (string, error) {
+	commands := []string{"xfreerdp3", "xfreerdp"}
+
+	for _, cmdName := range commands {
+		cmd := exec.Command("which", cmdName)
+		if err := cmd.Run(); err == nil {
+			return cmdName, nil
+		}
+	}
+	return "", errors.New("freerdp is not installed")
 }
