@@ -163,8 +163,8 @@ func (freerdp *freeRDP) FullScreenMode() *freeRDP {
 	return freerdp.AddArg("f", "")
 }
 
-func (freerdp *freeRDP) App(app *SeamlessApp) *freeRDP {
-	return freerdp.AddArg(app.toString(), "")
+func (freerdp *freeRDP) ArgumentBuildFrom(obj ArgumentBuilder) *freeRDP {
+	return freerdp.AddArg(obj.argumentBuild(), "")
 }
 
 // Execute the freeRDP command
