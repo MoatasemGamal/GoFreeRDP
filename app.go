@@ -1,6 +1,6 @@
 package gofreerdp
 
-type SeamlessApp struct {
+type App struct {
 	Program string
 	Cmd     string
 	File    string
