@@ -12,8 +12,15 @@ type ArgumentBuilder interface {
 
 func argumentBuild(obj interface{}) string {
 	var parts []string
-	val := reflect.ValueOf(obj).Elem() // Get the value of the struct (dereference the pointer)
-	typ := val.Type()                  // Get the type of the struct
+	val := reflect.ValueOf(obj)
+
+	// Check if obj is a pointer
+	if val.Kind() == reflect.Ptr {
+		// Dereference the pointer
+		val = val.Elem()
+	}
+
+	typ := val.Type() // Get the type of the struct
 
 	// Get the struct name (type name)
 	structName := typ.Name()
@@ -30,7 +37,10 @@ func argumentBuild(obj interface{}) string {
 		// Check if the field value is non-empty (string check for simplicity)
 		if strVal, ok := fieldValue.(string); ok && strVal != "" {
 			// Append the field name and value to parts
-			parts = append(parts, fmt.Sprintf("%s:'%s'", fieldName, strVal))
+			if strings.Contains(strVal, " ") {
+				strVal = fmt.Sprintf("\"%s\"", strVal) // Format the string with quotes
+			}
+			parts = append(parts, fmt.Sprintf("%s:%s", fieldName, strVal))
 		}
 	}
 
