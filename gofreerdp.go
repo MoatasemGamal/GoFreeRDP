@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
 
@@ -138,6 +139,10 @@ func (freerdp *freeRDP) optionsParse() []string {
 
 // Arguments methods
 func (freerdp *freeRDP) AddArg(argName, argValue string) *freeRDP {
+	argName = strings.TrimLeft(argName, "/")
+	argName = strings.TrimRight(argName, ":")
+	argValue = strings.Trim(argValue, ":")
+
 	if argValue != "" {
 		freerdp.arguments = append(freerdp.arguments, "/"+argName+":"+argValue)
 		return freerdp
