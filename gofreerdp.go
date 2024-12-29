@@ -47,6 +47,11 @@ const (
 	Option_windowDrag            = "window-drag"
 )
 
+const (
+	DisplayServer_Xorg    = "Xorg"
+	DisplayServer_Wayland = "wayland"
+)
+
 type RDPConfig struct {
 	Addr     string `validate:"required,hostname|ip"` // Addr is required, and must be a valid hostname or IP address
 	Username string `validate:"required"`             // Username is required
@@ -67,8 +72,12 @@ var (
 	once     sync.Once
 )
 
-func Init() (*freeRDP, error) {
-	xfreerdp, err := checkDependencies()
+func Init(displayServer string) (*freeRDP, error) {
+	var commands []string = []string{"xfreerdp3", "xfreerdp"}
+	if displayServer == DisplayServer_Wayland {
+		commands = []string{"wlfreerdp3", "wlfreerdp"}
+	}
+	freerdp, err := checkDependencies(commands)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +85,7 @@ func Init() (*freeRDP, error) {
 	once.Do(func() {
 		// Initialize the freerdp struct when first accessed
 		instance = &freeRDP{
-			freeRDP: xfreerdp,
+			freeRDP: freerdp,
 			options: make(map[string]bool),
 		}
 	})
@@ -191,9 +200,7 @@ func (freerdp *freeRDP) Run() error {
 }
 
 // helpers
-func checkDependencies() (string, error) {
-	commands := []string{"xfreerdp3", "xfreerdp"}
-
+func checkDependencies(commands []string) (string, error) {
 	for _, cmdName := range commands {
 		cmd := exec.Command("which", cmdName)
 		if err := cmd.Run(); err == nil {

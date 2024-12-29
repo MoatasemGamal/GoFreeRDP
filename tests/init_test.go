@@ -7,7 +7,7 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	if freeRDP, err := gofreerdp.Init(); freeRDP == nil || err != nil {
+	if freeRDP, err := gofreerdp.Init(gofreerdp.DisplayServer_Xorg); freeRDP == nil || err != nil {
 		t.Error(err)
 	}
 }
