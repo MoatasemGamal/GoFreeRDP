@@ -46,5 +46,5 @@ func argumentBuild(obj interface{}) string {
 
 	// Join all parts into a single string, separated by commas
 	// Return the struct name as the prefix (e.g., /app:params)
-	return fmt.Sprintf("/%s:%s", strings.ToLower(structName), strings.Join(parts, ", "))
+	return fmt.Sprintf("/%s:%s", strings.ToLower(structName), strings.Join(parts, ","))
 }
